@@ -568,9 +568,14 @@ static inline void ScbCcrSet(uint32_t val)
 
 static inline uint8_t _ScbExcPrioGet(uint8_t exc)
 {
+#if defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
+	__ASSERT((exc > 10) && (exc < 16), "");
+	return (__scs.scb.shpr[_PRIO_SHP_IDX(exc)] >> _PRIO_BIT_SHIFT(exc));
+#else
 	/* For priority exception handler 4-15 */
 	__ASSERT((exc > 3) && (exc < 16), "");
 	return __scs.scb.shpr[exc - 4];
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 }
 
 /**
@@ -592,9 +597,16 @@ static inline uint8_t _ScbExcPrioGet(uint8_t exc)
 
 static inline void _ScbExcPrioSet(uint8_t exc, uint8_t pri)
 {
+#if defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
+	volatile uint32_t * const shpr = &__scs.scb.shpr[_PRIO_SHP_IDX(exc)];
+	__ASSERT((exc > 10) && (exc < 16), "");
+	*shpr = ((*shpr & ~((uint32_t)0xff << _PRIO_BIT_SHIFT(exc))) |
+		 ((uint32_t)pri << _PRIO_BIT_SHIFT(exc)));
+#else
 	/* For priority exception handler 4-15 */
 	__ASSERT((exc > 3) && (exc < 16), "");
 	__scs.scb.shpr[exc - 4] = pri;
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 }
 
 #if !defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
