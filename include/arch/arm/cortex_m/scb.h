@@ -207,6 +207,7 @@ static inline int _ScbHiPriVectorPendingGet(void)
 	return reg.bit.vectpending;
 }
 
+#if !defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
 /**
  *
  * @brief Find out if the currently executing exception is nested
@@ -219,8 +220,10 @@ static inline int _ScbHiPriVectorPendingGet(void)
 static inline int _ScbIsNestedExc(void)
 {
 	/* !bit == preempted exceptions */
+
 	return !__scs.scb.icsr.bit.rettobase;
 }
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 
 /**
  *
@@ -280,6 +283,7 @@ static inline uint32_t _ScbActiveVectorGet(void)
 	return __scs.scb.icsr.bit.vectactive;
 }
 
+#if !defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
 /**
  *
  * @brief Find out if vector table is in SRAM or ROM
@@ -349,6 +353,7 @@ static inline void _ScbVtableAddrSet(uint32_t addr)
 	__ASSERT(!(addr & 0x7F), "invalid vtable base Addr");
 	__scs.scb.vtor.bit.tbloff = addr;
 }
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 
 /**
  *
@@ -365,6 +370,7 @@ static inline int _ScbIsDataLittleEndian(void)
 	return !(__scs.scb.aircr.bit.endianness);
 }
 
+#if !defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
 /**
  *
  * @brief Get the programmed number of priority groups
@@ -380,6 +386,7 @@ static inline int _ScbNumPriGroupGet(void)
 {
 	return 1 << (7 - __scs.scb.aircr.bit.prigroup);
 }
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 
 /**
  *
@@ -478,6 +485,7 @@ static inline void _ScbSleepDeepClear(void)
 	__scs.scb.scr.bit.sleepdeep = 0;
 }
 
+#if !defined(CONFIG_CPU_CORTEX_M0_M0PLUS)
 /**
  *
  * @brief Enable faulting on division by zero
@@ -507,6 +515,7 @@ static inline void _ScbDivByZeroFaultDisable(void)
 {
 	__scs.scb.ccr.bit.div_0_trp = 0;
 }
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 
 /**
  *
@@ -1219,7 +1228,7 @@ static inline void _ScbUsageFaultAllFaultsReset(void)
 	__scs.scb.cfsr.byte.ufsr.val = 0xffff;
 }
 
-#endif /* !CONFIG_CPU_CORTEX_M0_M0PLUS */
+#endif /* CONFIG_CPU_CORTEX_M0_M0PLUS */
 
 #endif /* _ASMLANGUAGE */
 
